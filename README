@@ -1,0 +1,91 @@
+#README
+
+#文件树
+==================================================
+.isql
+	|--isql.l		flex文件，用于isql的词法分析
+	|--isql.y		bison文件，用于isql的语法分析及语法树构建
+	|--isql_main.h	isql的主要函数，结构及宏声明
+	|--isql_main.c	isql的主要函数实现
+	|--isql.db/dat	isql的数据库文件
+	|--isql			isql可执行文件
+	|--makefile		Makefile
+	|--README.txt	说明文件
+
+#关于版本和版权
+==================================================
+version 1.0
+	为isql的第一个版本，很多不完善的地方，下面会具体说明功能及缺陷，2.0在大三考试结束后推出
+	任何人都可以自由修改和使用源码
+	如有问题与我联系：roselonelh@gmail.com
+
+#运行方法
+==================================================
+linux平台开发，使用flex && bison进行语法词法生成
+现给出Ubuntu下的配置方法，其他发行版类似
+
+1，isql使用c语言编写，首选需要安装build-essential,gcc,flex,bison，命令如下：
+	$ sudo apt-get install build-essential gcc flex bison
+2，老一套，直接make即可，编译过程参见makefile
+	$ make
+3，运行，默任生成到当前目录，文件名isql
+	$ ./isql
+4，身份验证
+	管理员用户名和密码都为admin，登录即可
+
+# version 1.0 已实现的功能
+==================================================
+1，部分支持SQL规范
+2，识别大小写
+3，可以识别的语法
+	a创建用户，数据库，表		| CREATE
+	b删除数据库，表				| DROP
+	c用户权限分配和收回			| GRANT REVOKE
+	d插入 查询 表数据			| INSERT SELECT 
+	e删除 修改 表数据			| DELETE UPDATE
+4，完成a~d的语法树构建及语法制导翻译
+5，登录身份的MD5验证
+6，物理存储结构设计及实现
+
+# version 1.0 的缺陷 [在下一版中会改进和实现]
+==================================================
+1，不支持查询嵌套
+2，未实现e功能
+3，where子句查询有bug，先屏蔽掉了
+4，数据库操作权限验证查询有bug，先屏蔽掉了
+5，没有异常处理
+6，仅支持int和string两种数据类型
+7，没有数据库数据空间整理，会不断增长
+8，物理存储设计在实验阶段，所能创建的用户和数据库数量有限，这个只要修改配置文件即可，不影响整体的物理结构设计
+9，用户密码是明文输入，没有用****代替
+
+#关于安全机制
+==================================================
+1，用户密码使用MD5加密存储
+	使用md5sum进行MD5校验(128-bit)
+	GNU coreutils 项目主页：<http://www.gnu.org/software/coreutils/>
+	使用bash shell调用MD5SUM计算：echo PASSWD | md5sum
+
+2，数据库操作权限验证方法
+		#define P_SELECT	 0001
+		#define P_INSERT	 0010
+		#define P_UPDATE	 0100
+		#define P_DELETE	 1000
+	admin用户默认权限：1111，用户编码为0，且只有admin可以进行权力的授予和收回。
+	验证权限：POWER & POWER_NEEDED
+	授予权限：POWER | POWER_GRANT
+	收回权限：~(POWER & POWER_REVOKE)
+
+#物理存储
+==================================================
+isql.db		用于存储数据库结构信息
+isql.dat	用于存储数据库数据信息
+
+以下三个函数用于数据库文件操作：
+char *read_D(FILE *fin, int offset, int length);
+void write_D(FILE *fin, int offset, char *str);
+void fill_D(FILE *fin, int offset, int length, char t);
+
+寻址采用类似内存的基址+偏移量方式
+数据信息存储文件isql.dat采用类似FAT12的管理方式
+
