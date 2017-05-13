@@ -125,9 +125,10 @@ expr: '(' expr ')'		{ $$=$2; }
 	;
 
 /*start*/
-stmt_list: 
+stmt_list:
 	| stmt_list ';' { printf("> "); }
 	| stmt_list stmt ';' { printf("> "); }
+	| stmt_list error { yyclearin; yyerrok; printf("> "); }
 	;
 
 /*stmt:select statement*/

@@ -57,6 +57,12 @@ void yyerror (char *s, ...){
 	fprintf(stderr,"\n");
 }
 
+void eat_to_newline(){
+	int c;
+	while((c = getchar()) != EOF && c != '\n')
+		;
+}
+
 int judge(FILE *fin,FILE *fout,char *tname,int power){ //还未加入使用
 	int offset=D_PAGE*PAGE_SIZE+DT_HANDLE*D_HEAD_SIZE;
 	int table_num=atoi(read_D(fin,offset+D_NAME_SIZE,32)); //D中现有table数

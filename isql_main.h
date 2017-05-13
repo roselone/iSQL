@@ -53,6 +53,7 @@
 static char null=(char)0x00;
 
 void yyerror(char *s, ...);
+void eat_to_newline();
 void emit(char *s, ...);
 //void shell_exec(char *cmd); popen(cmd,"r"); echo fuckyou | md5sum
 char *get_MD5(char *str);
